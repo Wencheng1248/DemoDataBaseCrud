@@ -2,10 +2,14 @@ package com.myapplicationdev.android.demodatabasecrud;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,6 +20,8 @@ public class MainActivity extends AppCompatActivity {
     TextView tvDBContent;
     EditText etContent;
     ArrayList<Note> al;
+    ListView lv;
+    ArrayAdapter<Note> aa;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +33,26 @@ public class MainActivity extends AppCompatActivity {
         btnEdit = findViewById(R.id.buttonEdit);
         btnRetrieve = findViewById(R.id.buttonRetrieve);
         tvDBContent = findViewById(R.id.tvDBContent);
-        etContent =findViewById(R.id.etContent);
+        etContent =findViewById(R.id.etContent2);
+
+        lv = findViewById(R.id.lv);
+        aa = new ArrayAdapter<Note>(this,
+                android.R.layout.simple_list_item_1, al);
+        lv.setAdapter(aa);
+
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int
+                    position, long identity) {
+                Note data = al.get(position);
+                Intent i = new Intent(MainActivity.this,
+                        EditActivity.class);
+                i.putExtra("data", data);
+                startActivityForResult(i, 9);
+            }
+        });
+
+
 
 
         al = new ArrayList<Note>();
@@ -61,8 +86,33 @@ public class MainActivity extends AppCompatActivity {
                             tmp.getNoteContent() + "\n";
                 }
                 tvDBContent.setText(txt);
+                aa.notifyDataSetChanged();
             }
         });
+        btnEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Note target = al.get(0);
+
+                Intent i = new Intent(MainActivity.this,
+                        EditActivity.class);
+                i.putExtra("data", target);
+                startActivityForResult(i, 9);
+            }
+        });
+
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode,
+                                    Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK && requestCode == 9){
+            btnRetrieve.performClick();
+        }
+    }
+
+
 
 }
